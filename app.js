@@ -1,51 +1,158 @@
-const exercises = { 'Flat Chest Press': 'weight-reps', 'Incline Chest Press': 'weight-reps', 'Tricep Extensions': 'weight-reps', 'Push-ups': 'reps',
+const exercises = {
+  'Flat Chest Press': 'weight-reps',
+  'Incline Chest Press': 'weight-reps',
+  'Tricep Extensions': 'weight-reps',
+  'Push-ups': 'reps',
+  'Leg Curls': 'weight-reps',
+  'Stepper': 'weight-reps',
+  'Bike Intervals': 'time',
+  'Bicep Curls': 'weight-reps',
+  'Hammer Curls': 'weight-reps',
+  'Forearm Machine': 'weight-reps',
+  'Bent-over Rows': 'weight-reps',
+  'Overhead Press': 'weight-reps',
+  'Lateral Raises': 'weight-reps',
+  'Plank': 'time',
+  'Crunches': 'reps'
+};
 
-'Leg Curls': 'weight-reps', 'Stepper': 'weight-reps', 'Bike Intervals': 'time',
+function renderPlan() {
+  const container = document.getElementById('workout-plan');
+  container.innerHTML = '<h2>Log a New Exercise</h2>';
 
-'Bicep Curls': 'weight-reps', 'Hammer Curls': 'weight-reps', 'Forearm Machine': 'weight-reps', 'Bent-over Rows': 'weight-reps',
+  const form = document.createElement('form');
+  form.classList.add('exercise-log-form');
+  form.innerHTML = `
+    <label for="exercise-select">Select Exercise:</label>
+    <select id="exercise-select">
+      ${Object.keys(exercises).map(e => `<option value="${e}">${e}</option>`).join('')}
+    </select><br><br>
 
-'Overhead Press': 'weight-reps', 'Lateral Raises': 'weight-reps', 'Plank': 'time', 'Crunches': 'reps' };
+    <label for="set-count">How many sets?</label>
+    <input type="number" id="set-count" value="3" min="1" max="10"><br><br>
 
-function renderPlan() { const container = document.getElementById('workout-plan'); container.innerHTML = '<h2>Log a New Exercise</h2>';
+    <div id="set-inputs"></div>
 
-const form = document.createElement('form'); form.classList.add('exercise-log-form'); form.innerHTML = <label for="exercise-select">Select Exercise:</label> <select id="exercise-select"> ${Object.keys(exercises).map(e =><option value="${e}">${e}</option>`).join('')} </select><br><br>
+    <button type="submit">Save Workout</button>
+  `;
 
-<label for="set-count">How many sets?</label>
-<input type="number" id="set-count" value="3" min="1" max="10"><br><br>
+  form.onsubmit = function (e) {
+    e.preventDefault();
+    const exercise = document.getElementById('exercise-select').value;
+    const sets = document.querySelectorAll('.set-input');
+    const log = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString(),
+      exercise,
+      sets: Array.from(sets).map(set => ({
+        reps: set.querySelector('.reps')?.value || null,
+        weight: set.querySelector('.weight')?.value || null,
+        time: set.querySelector('.time')?.value || null
+      }))
+    };
+    const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
+    logs.unshift(log);
+    localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs));
+    renderLogs();
+    form.reset();
+    document.getElementById('set-inputs').innerHTML = '';
+  };
 
-<div id="set-inputs"></div>
+  container.appendChild(form);
+  console.log("Form injected");
 
-<button type="submit">Save Workout</button>
+  setTimeout(() => generateSetInputs(), 0);
 
-`;
+  document.getElementById('set-count').addEventListener('input', generateSetInputs);
+  document.getElementById('exercise-select').addEventListener('change', generateSetInputs);
+}
 
-form.onsubmit = function (e) { e.preventDefault(); const exercise = document.getElementById('exercise-select').value; const sets = document.querySelectorAll('.set-input'); const log = { id: Date.now(), date: new Date().toLocaleDateString(), exercise, sets: Array.from(sets).map(set => { return { reps: set.querySelector('.reps')?.value || null, weight: set.querySelector('.weight')?.value || null, time: set.querySelector('.time')?.value || null }; }) }; const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || []; logs.unshift(log); localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs)); renderLogs(); form.reset(); document.getElementById('set-inputs').innerHTML = ''; };
+function generateSetInputs() {
+  const select = document.getElementById('exercise-select');
+  const countInput = document.getElementById('set-count');
 
-container.appendChild(form); setTimeout(() => generateSetInputs(), 0);
+  if (!select || !countInput) return;
 
-document.getElementById('set-count').addEventListener('input', generateSetInputs); document.getElementById('exercise-select').addEventListener('change', generateSetInputs); }
+  const count = parseInt(countInput.value);
+  const exercise = select.value;
+  const type = exercises[exercise];
+  const inputContainer = document.getElementById('set-inputs');
+  inputContainer.innerHTML = '';
 
-function generateSetInputs() { const count = parseInt(document.getElementById('set-count').value); const exercise = document.getElementById('exercise-select').value; const type = exercises[exercise]; const inputContainer = document.getElementById('set-inputs'); inputContainer.innerHTML = ''; for (let i = 1; i <= count; i++) { let inputs = ''; if (type === 'weight-reps') { inputs += 'Weight (lbs): <input type="number" class="weight" required> '; inputs += 'Reps: <input type="number" class="reps" required>'; } else if (type === 'reps') { inputs += 'Reps: <input type="number" class="reps" required>'; } else if (type === 'time') { inputs += 'Time (seconds): <input type="number" class="time" required>'; } inputContainer.innerHTML += <div class="set-input"> <strong>Set ${i}</strong><br> ${inputs}<br><br> </div>; } }
+  for (let i = 1; i <= count; i++) {
+    let inputs = '';
+    if (type === 'weight-reps') {
+      inputs += 'Weight (lbs): <input type="number" class="weight" required> ';
+      inputs += 'Reps: <input type="number" class="reps" required>';
+    } else if (type === 'reps') {
+      inputs += 'Reps: <input type="number" class="reps" required>';
+    } else if (type === 'time') {
+      inputs += 'Time (seconds): <input type="number" class="time" required>';
+    }
 
-function renderLogs() { const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || []; const list = document.getElementById('log-list'); list.innerHTML = ''; logs.forEach((log, index) => { const setsText = log.sets.map((s, i) => { const parts = []; if (s.reps) parts.push(${s.reps} reps); if (s.weight) parts.push(@ ${s.weight} lbs); if (s.time) parts.push(${s.time} sec); return Set ${i + 1}: ${parts.join(' ')}; }).join(' | ');
+    inputContainer.innerHTML += `
+      <div class="set-input">
+        <strong>Set ${i}</strong><br>
+        ${inputs}<br><br>
+      </div>
+    `;
+  }
+}
 
-const item = document.createElement('li');
-item.innerHTML = `${log.date} – ${log.exercise}: ${setsText} <br>
-  <button onclick="editLog(${log.id})">Edit</button>
-  <button onclick="deleteLog(${log.id})">Delete</button>`;
-list.appendChild(item);
+function renderLogs() {
+  const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
+  const list = document.getElementById('log-list');
+  list.innerHTML = '';
+  logs.forEach((log, index) => {
+    const setsText = log.sets.map((s, i) => {
+      const parts = [];
+      if (s.reps) parts.push(`${s.reps} reps`);
+      if (s.weight) parts.push(`@ ${s.weight} lbs`);
+      if (s.time) parts.push(`${s.time} sec`);
+      return `Set ${i + 1}: ${parts.join(' ')}`;
+    }).join(' | ');
 
-}); }
+    const item = document.createElement('li');
+    item.innerHTML = `${log.date} – ${log.exercise}: ${setsText} <br>
+      <button onclick="editLog(${log.id})">Edit</button>
+      <button onclick="deleteLog(${log.id})">Delete</button>`;
+    list.appendChild(item);
+  });
+}
 
-function deleteLog(id) { let logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || []; logs = logs.filter(log => log.id !== id); localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs)); renderLogs(); }
+function deleteLog(id) {
+  let logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
+  logs = logs.filter(log => log.id !== id);
+  localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs));
+  renderLogs();
+}
 
-function editLog(id) { const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || []; const log = logs.find(l => l.id === id); if (!log) return;
+function editLog(id) {
+  const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
+  const log = logs.find(l => l.id === id);
+  if (!log) return;
 
-document.getElementById('exercise-select').value = log.exercise; document.getElementById('set-count').value = log.sets.length; generateSetInputs();
+  document.getElementById('exercise-select').value = log.exercise;
+  document.getElementById('set-count').value = log.sets.length;
+  generateSetInputs();
 
-setTimeout(() => { const inputs = document.querySelectorAll('.set-input'); log.sets.forEach((s, i) => { const input = inputs[i]; if (s.weight) input.querySelector('.weight').value = s.weight; if (s.reps) input.querySelector('.reps').value = s.reps; if (s.time) input.querySelector('.time').value = s.time; }); }, 0);
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.set-input');
+    log.sets.forEach((s, i) => {
+      const input = inputs[i];
+      if (s.weight) input.querySelector('.weight').value = s.weight;
+      if (s.reps) input.querySelector('.reps').value = s.reps;
+      if (s.time) input.querySelector('.time').value = s.time;
+    });
+  }, 0);
 
-deleteLog(id); }
+  deleteLog(id);
+}
 
-window.onload = () => { renderPlan(); renderLogs(); if ('serviceWorker' in navigator) { navigator.serviceWorker.register('service-worker.js'); } };
-
+window.onload = () => {
+  renderPlan();
+  renderLogs();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+};
