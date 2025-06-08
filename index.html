@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2d2d2d" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Workout Tracker</title>
+</head>
+<body>
+  <div class="container">
+    <h1>🏋️‍♂️ Dom's Workout Tracker</h1>
+    <div id="workout-plan"></div>
+    <div id="log-section">
+      <h2>Log Today's Workout</h2>
+      <textarea id="log-input" placeholder="Write what you did today..."></textarea>
+      <button onclick="saveLog()">Save</button>
+    </div>
+    <div id="log-history">
+      <h2>📅 Workout History</h2>
+      <ul id="log-list"></ul>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
