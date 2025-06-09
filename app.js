@@ -1,4 +1,3 @@
-
 let customExercises = JSON.parse(localStorage.getItem('customExercises')) || {};
 
 function getOrAskName() {
@@ -54,6 +53,7 @@ function renderPlan() {
 
   document.getElementById('exercise-form').onsubmit = function (e) {
     e.preventDefault();
+
     const exercise = document.getElementById('exercise-select').value;
     const sets = document.querySelectorAll('.set-input');
 
@@ -104,6 +104,7 @@ function renderAddExerciseForm() {
 
   document.getElementById('new-exercise-form').onsubmit = function(e) {
     e.preventDefault();
+
     const name = document.getElementById('custom-exercise-name').value.trim();
     const fields = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
     if (!name || fields.length === 0) return;
@@ -127,15 +128,24 @@ function generateSetInputs() {
 
   for (let i = 1; i <= count; i++) {
     let inputs = '';
-    if (fields.includes('weight')) inputs += `Weight (lbs): <input type="number" class="weight" required> `;
-    if (fields.includes('reps')) inputs += `Reps: <input type="number" class="reps" required> `;
-    if (fields.includes('time-minutes')) inputs += `Minutes: <input type="number" class="time" required> `;
-    if (fields.includes('time-seconds')) inputs += `Seconds: <input type="number" class="time" required> `;
+
+    if (fields.includes('weight')) {
+      inputs += `<div class="set-input-row"><label>Weight (lbs): <input type="number" class="weight" required></label></div>`;
+    }
+    if (fields.includes('reps')) {
+      inputs += `<div class="set-input-row"><label>Reps: <input type="number" class="reps" required></label></div>`;
+    }
+    if (fields.includes('time-minutes')) {
+      inputs += `<div class="set-input-row"><label>Minutes: <input type="number" class="time" required></label></div>`;
+    }
+    if (fields.includes('time-seconds')) {
+      inputs += `<div class="set-input-row"><label>Seconds: <input type="number" class="time" required></label></div>`;
+    }
 
     inputContainer.innerHTML += `
       <div class="set-input">
         <strong>Set ${i}</strong><br>
-        ${inputs}<br><br>
+        ${inputs}
       </div>
     `;
   }
