@@ -70,7 +70,6 @@ function renderPlan() {
 function generateSetInputs() {
   const select = document.getElementById('exercise-select');
   const countInput = document.getElementById('set-count');
-
   if (!select || !countInput) return;
 
   const count = parseInt(countInput.value);
@@ -89,7 +88,6 @@ function generateSetInputs() {
     } else if (type === 'time') {
       inputs += 'Time (seconds): <input type="number" class="time" required>';
     }
-
     inputContainer.innerHTML += `
       <div class="set-input">
         <strong>Set ${i}</strong><br>
@@ -103,20 +101,47 @@ function renderLogs() {
   const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
   const list = document.getElementById('log-list');
   list.innerHTML = '';
-  logs.forEach((log, index) => {
-    const setsText = log.sets.map((s, i) => {
-      const parts = [];
-      if (s.reps) parts.push(`${s.reps} reps`);
-      if (s.weight) parts.push(`@ ${s.weight} lbs`);
-      if (s.time) parts.push(`${s.time} sec`);
-      return `Set ${i + 1}: ${parts.join(' ')}`;
-    }).join(' | ');
 
-    const item = document.createElement('li');
-    item.innerHTML = `${log.date} – ${log.exercise}: ${setsText} <br>
-      <button onclick="editLog(${log.id})">Edit</button>
-      <button onclick="deleteLog(${log.id})">Delete</button>`;
-    list.appendChild(item);
+  const grouped = logs.reduce((acc, log) => {
+    if (!acc[log.date]) acc[log.date] = [];
+    acc[log.date].push(log);
+    return acc;
+  }, {});
+
+  Object.keys(grouped).forEach(date => {
+    const summary = document.createElement('li');
+    const expand = document.createElement('button');
+    expand.textContent = '+ ' + date;
+    expand.className = 'toggle-button';
+
+    const detailList = document.createElement('ul');
+    detailList.style.display = 'none';
+
+    grouped[date].forEach(log => {
+      const setsText = log.sets.map((s, i) => {
+        const parts = [];
+        if (s.reps) parts.push(`${s.reps} reps`);
+        if (s.weight) parts.push(`@ ${s.weight} lbs`);
+        if (s.time) parts.push(`${s.time} sec`);
+        return `Set ${i + 1}: ${parts.join(' ')}`;
+      }).join(' | ');
+
+      const item = document.createElement('li');
+      item.innerHTML = `${log.exercise}: ${setsText} <br>
+        <button onclick="editLog(${log.id})">Edit</button>
+        <button onclick="deleteLog(${log.id})">Delete</button>`;
+      detailList.appendChild(item);
+    });
+
+    expand.onclick = () => {
+      const isVisible = detailList.style.display === 'block';
+      detailList.style.display = isVisible ? 'none' : 'block';
+      expand.textContent = (isVisible ? '+ ' : '- ') + date;
+    };
+
+    summary.appendChild(expand);
+    summary.appendChild(detailList);
+    list.appendChild(summary);
   });
 }
 
