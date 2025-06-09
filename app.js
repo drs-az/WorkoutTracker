@@ -91,10 +91,10 @@ function renderAddExerciseForm() {
       <input type="text" id="custom-exercise-name" required><br><br>
 
       <label>Select Fields:</label><br>
-      <label class="custom-field-row"><input type="checkbox" value="weight"> Weight</label>
-      <label class="custom-field-row"><input type="checkbox" value="reps"> Reps</label>
-      <label class="custom-field-row"><input type="checkbox" value="time-minutes"> Time (minutes)</label>
-      <label class="custom-field-row"><input type="checkbox" value="time-seconds"> Time (seconds)</label><br><br>
+      <label><input type="checkbox" value="weight"> Weight</label>
+      <label><input type="checkbox" value="reps"> Reps</label>
+      <label><input type="checkbox" value="time-minutes"> Time (minutes)</label>
+      <label><input type="checkbox" value="time-seconds"> Time (seconds)</label><br><br>
 
       <button type="submit">Add Exercise</button>
     </form>
