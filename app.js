@@ -1,6 +1,6 @@
-const exercises = { 'Flat Chest Press': 'weight-reps', 'Incline Chest Press': 'weight-reps', 'Tricep Extensions': 'weight-reps', 'Push-ups': 'reps', 'Leg Curls': 'weight-reps', 'Stepper': 'weight-reps', 'Bike Intervals': 'time', 'Bicep Curls': 'weight-reps', 'Hammer Curls': 'weight-reps', 'Forearm Machine': 'weight-reps', 'Bent-over Rows': 'weight-reps', 'Overhead Press': 'weight-reps', 'Lateral Raises': 'weight-reps', 'Plank': 'time', 'Crunches': 'reps' };
-
 function getOrAskName() { let name = localStorage.getItem('userFirstName'); if (!name) { name = prompt('Welcome! What is your first name?'); if (name) localStorage.setItem('userFirstName', name); } document.getElementById('app-title').textContent = ${name || 'My'}'s Workout Tracker; }
+
+const exercises = { 'Flat Chest Press': 'weight-reps', 'Incline Chest Press': 'weight-reps', 'Tricep Extensions': 'weight-reps', 'Push-ups': 'reps', 'Leg Curls': 'weight-reps', 'Stepper': 'weight-reps', 'Bike Intervals': 'time', 'Bicep Curls': 'weight-reps', 'Hammer Curls': 'weight-reps', 'Forearm Machine': 'weight-reps', 'Bent-over Rows': 'weight-reps', 'Overhead Press': 'weight-reps', 'Lateral Raises': 'weight-reps', 'Plank': 'time', 'Crunches': 'reps' };
 
 function renderPlan() { const container = document.getElementById('workout-plan'); container.innerHTML = '<h2>Log a New Exercise</h2>';
 
