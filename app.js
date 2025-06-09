@@ -84,35 +84,35 @@ function renderPlan() {
 
 function renderAddExerciseForm() {
   const container = document.getElementById('workout-plan');
-  container.innerHTML = `
-    <h2>Add a Custom Exercise</h2>
-    <form id="new-exercise-form">
-      <label>Exercise Name:</label>
-      <input type="text" id="custom-exercise-name" required><br><br>
+container.innerHTML = `
+  <h2>Add a Custom Exercise</h2>
+  <form id="new-exercise-form">
+    <label>Exercise Name:</label>
+    <input type="text" id="custom-exercise-name" required><br><br>
 
-      <label>Select Fields:</label><br>
-      <div class="custom-field-row">
-        <input type="checkbox" value="weight" id="field-weight">
-        <label for="field-weight">Weight</label>
-      </div>
-      <div class="custom-field-row">
-        <input type="checkbox" value="reps" id="field-reps">
-        <label for="field-reps">Reps</label>
-      </div>
-      <div class="custom-field-row">
-        <input type="checkbox" value="time-minutes" id="field-time-minutes">
-        <label for="field-time-minutes">Time (minutes)</label>
-      </div>
-      <div class="custom-field-row">
-        <input type="checkbox" value="time-seconds" id="field-time-seconds">
-        <label for="field-time-seconds">Time (seconds)</label>
-      </div><br>
+    <label>Select Fields:</label><br>
+    <div class="custom-field-row">
+      <input type="checkbox" value="weight" id="field-weight">
+      <label for="field-weight">Weight</label>
+    </div>
+    <div class="custom-field-row">
+      <input type="checkbox" value="reps" id="field-reps">
+      <label for="field-reps">Reps</label>
+    </div>
+    <div class="custom-field-row">
+      <input type="checkbox" value="time-minutes" id="field-time-minutes">
+      <label for="field-time-minutes">Time (minutes)</label>
+    </div>
+    <div class="custom-field-row">
+      <input type="checkbox" value="time-seconds" id="field-time-seconds">
+      <label for="field-time-seconds">Time (seconds)</label>
+    </div><br>
 
-      <button type="submit">Add Exercise</button>
-    </form>
-    <br>
-    <button onclick="renderPlan()">Back to Workout Logger</button>
-  `;
+    <button type="submit">Add Exercise</button>
+  </form>
+  <br>
+  <button onclick="renderPlan()">Back to Workout Logger</button>
+`;
 
   document.getElementById('new-exercise-form').onsubmit = function(e) {
     e.preventDefault();
