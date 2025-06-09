@@ -17,14 +17,14 @@ const defaultExercises = {
   'Push-ups': ['reps'],
   'Leg Curls': ['weight', 'reps'],
   'Stepper': ['weight', 'reps'],
-  'Bike Intervals': ['time-seconds'],
+  'Bike Intervals': ['time-minutes'],
   'Bicep Curls': ['weight', 'reps'],
   'Hammer Curls': ['weight', 'reps'],
   'Forearm Machine': ['weight', 'reps'],
   'Bent-over Rows': ['weight', 'reps'],
   'Overhead Press': ['weight', 'reps'],
   'Lateral Raises': ['weight', 'reps'],
-  'Plank': ['time-seconds'],
+  'Plank': ['time-minutes'],
   'Crunches': ['reps']
 };
 
