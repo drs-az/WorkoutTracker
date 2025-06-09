@@ -1,3 +1,6 @@
+
+let customExercises = JSON.parse(localStorage.getItem('customExercises')) || {};
+
 function getOrAskName() {
   let name = localStorage.getItem('userFirstName');
   if (!name) {
@@ -7,47 +10,49 @@ function getOrAskName() {
   document.getElementById('app-title').textContent = `${name || 'My'}'s Workout Tracker`;
 }
 
-const exercises = {
-  'Flat Chest Press': 'weight-reps',
-  'Incline Chest Press': 'weight-reps',
-  'Tricep Extensions': 'weight-reps',
-  'Push-ups': 'reps',
-  'Leg Curls': 'weight-reps',
-  'Stepper': 'weight-reps',
-  'Bike Intervals': 'time',
-  'Bicep Curls': 'weight-reps',
-  'Hammer Curls': 'weight-reps',
-  'Forearm Machine': 'weight-reps',
-  'Bent-over Rows': 'weight-reps',
-  'Overhead Press': 'weight-reps',
-  'Lateral Raises': 'weight-reps',
-  'Plank': 'time',
-  'Crunches': 'reps'
+const defaultExercises = {
+  'Flat Chest Press': ['weight', 'reps'],
+  'Incline Chest Press': ['weight', 'reps'],
+  'Tricep Extensions': ['weight', 'reps'],
+  'Push-ups': ['reps'],
+  'Leg Curls': ['weight', 'reps'],
+  'Stepper': ['weight', 'reps'],
+  'Bike Intervals': ['time-seconds'],
+  'Bicep Curls': ['weight', 'reps'],
+  'Hammer Curls': ['weight', 'reps'],
+  'Forearm Machine': ['weight', 'reps'],
+  'Bent-over Rows': ['weight', 'reps'],
+  'Overhead Press': ['weight', 'reps'],
+  'Lateral Raises': ['weight', 'reps'],
+  'Plank': ['time-seconds'],
+  'Crunches': ['reps']
 };
+
+function getAllExercises() {
+  return { ...defaultExercises, ...customExercises };
+}
 
 function renderPlan() {
   const container = document.getElementById('workout-plan');
-  container.innerHTML = '<h2>Log a New Exercise</h2>';
+  container.innerHTML = `
+    <h2>Log a New Exercise</h2>
+    <form class="exercise-log-form" id="exercise-form">
+      <label for="exercise-select">Select Exercise:</label>
+      <select id="exercise-select">
+        ${Object.keys(getAllExercises()).map(e => `<option value="${e}">${e}</option>`).join('')}
+      </select><br><br>
 
-  const form = document.createElement('form');
-  form.classList.add('exercise-log-form');
-  form.innerHTML = `
-    <label for="exercise-select">Select Exercise:</label>
-    <select id="exercise-select">
-      ${Object.keys(exercises)
-        .map(e => `<option value="${e}">${e}</option>`)
-        .join('')}
-    </select><br><br>
+      <label for="set-count">How many sets?</label>
+      <input type="number" id="set-count" value="3" min="1" max="10"><br><br>
 
-    <label for="set-count">How many sets?</label>
-    <input type="number" id="set-count" value="3" min="1" max="10"><br><br>
-
-    <div id="set-inputs"></div>
-
-    <button type="submit">Save Workout</button>
+      <div id="set-inputs"></div>
+      <button type="submit">Save Workout</button>
+    </form>
+    <br>
+    <button onclick="renderAddExerciseForm()">âž• Add New Exercise</button>
   `;
 
-  form.onsubmit = function (e) {
+  document.getElementById('exercise-form').onsubmit = function (e) {
     e.preventDefault();
     const exercise = document.getElementById('exercise-select').value;
     const sets = document.querySelectorAll('.set-input');
@@ -68,14 +73,45 @@ function renderPlan() {
     localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs));
 
     renderLogs();
-    form.reset();
     document.getElementById('set-inputs').innerHTML = '';
+    e.target.reset();
   };
 
-  container.appendChild(form);
   generateSetInputs();
   document.getElementById('set-count').addEventListener('input', generateSetInputs);
   document.getElementById('exercise-select').addEventListener('change', generateSetInputs);
+}
+
+function renderAddExerciseForm() {
+  const container = document.getElementById('workout-plan');
+  container.innerHTML = `
+    <h2>Add a Custom Exercise</h2>
+    <form id="new-exercise-form">
+      <label>Exercise Name:</label>
+      <input type="text" id="custom-exercise-name" required><br><br>
+
+      <label>Select Fields:</label><br>
+      <label><input type="checkbox" value="weight"> Weight</label><br>
+      <label><input type="checkbox" value="reps"> Reps</label><br>
+      <label><input type="checkbox" value="time-minutes"> Time (minutes)</label><br>
+      <label><input type="checkbox" value="time-seconds"> Time (seconds)</label><br><br>
+
+      <button type="submit">Add Exercise</button>
+    </form>
+    <br>
+    <button onclick="renderPlan()">â¬… Back to Workout Logger</button>
+  `;
+
+  document.getElementById('new-exercise-form').onsubmit = function(e) {
+    e.preventDefault();
+    const name = document.getElementById('custom-exercise-name').value.trim();
+    const fields = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+    if (!name || fields.length === 0) return;
+
+    customExercises[name] = fields;
+    localStorage.setItem('customExercises', JSON.stringify(customExercises));
+    renderPlan();
+  };
 }
 
 function generateSetInputs() {
@@ -85,20 +121,16 @@ function generateSetInputs() {
 
   const count = parseInt(countInput.value);
   const exercise = select.value;
-  const type = exercises[exercise];
+  const fields = getAllExercises()[exercise];
   const inputContainer = document.getElementById('set-inputs');
   inputContainer.innerHTML = '';
 
   for (let i = 1; i <= count; i++) {
     let inputs = '';
-    if (type === 'weight-reps') {
-      inputs += `Weight (lbs): <input type="number" class="weight" required> `;
-      inputs += `Reps: <input type="number" class="reps" required>`;
-    } else if (type === 'reps') {
-      inputs += `Reps: <input type="number" class="reps" required>`;
-    } else if (type === 'time') {
-      inputs += `Time (seconds): <input type="number" class="time" required>`;
-    }
+    if (fields.includes('weight')) inputs += `Weight (lbs): <input type="number" class="weight" required> `;
+    if (fields.includes('reps')) inputs += `Reps: <input type="number" class="reps" required> `;
+    if (fields.includes('time-minutes')) inputs += `Minutes: <input type="number" class="time" required> `;
+    if (fields.includes('time-seconds')) inputs += `Seconds: <input type="number" class="time" required> `;
 
     inputContainer.innerHTML += `
       <div class="set-input">
