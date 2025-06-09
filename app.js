@@ -17,14 +17,14 @@ const defaultExercises = {
   'Push-ups': ['reps'],
   'Leg Curls': ['weight', 'reps'],
   'Stepper': ['weight', 'reps'],
-  'Bike Intervals': ['time-minutes'],
+  'Bike Intervals': ['time-seconds'],
   'Bicep Curls': ['weight', 'reps'],
   'Hammer Curls': ['weight', 'reps'],
   'Forearm Machine': ['weight', 'reps'],
   'Bent-over Rows': ['weight', 'reps'],
   'Overhead Press': ['weight', 'reps'],
   'Lateral Raises': ['weight', 'reps'],
-  'Plank': ['time-minutes'],
+  'Plank': ['time-seconds'],
   'Crunches': ['reps']
 };
 
@@ -49,7 +49,7 @@ function renderPlan() {
       <button type="submit">Save Workout</button>
     </form>
     <br>
-    <button onclick="renderAddExerciseForm()">Add New Exercise</button>
+    <button onclick="renderAddExerciseForm()">âž• Add New Exercise</button>
   `;
 
   document.getElementById('exercise-form').onsubmit = function (e) {
@@ -91,15 +91,15 @@ function renderAddExerciseForm() {
       <input type="text" id="custom-exercise-name" required><br><br>
 
       <label>Select Fields:</label><br>
-      <label><input type="checkbox" value="weight"> Weight</label><br>
-      <label><input type="checkbox" value="reps"> Reps</label><br>
-      <label><input type="checkbox" value="time-minutes"> Time (minutes)</label><br>
-      <label><input type="checkbox" value="time-seconds"> Time (seconds)</label><br><br>
+      <label class="custom-field-row"><input type="checkbox" value="weight"> Weight</label>
+      <label class="custom-field-row"><input type="checkbox" value="reps"> Reps</label>
+      <label class="custom-field-row"><input type="checkbox" value="time-minutes"> Time (minutes)</label>
+      <label class="custom-field-row"><input type="checkbox" value="time-seconds"> Time (seconds)</label><br><br>
 
       <button type="submit">Add Exercise</button>
     </form>
     <br>
-    <button onclick="renderPlan()">Back to Workout Logger</button>
+    <button onclick="renderPlan()">â¬… Back to Workout Logger</button>
   `;
 
   document.getElementById('new-exercise-form').onsubmit = function(e) {
