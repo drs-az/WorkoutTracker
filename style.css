@@ -101,3 +101,14 @@ li button:hover {
   margin-bottom: 0.5rem;
 }
 
+/* Align checkboxes and labels */
+.custom-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.custom-field-row input[type="checkbox"] {
+  margin: 0;
+}
