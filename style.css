@@ -96,12 +96,13 @@ li button:hover {
 .custom-field-row {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 1rem;
 }
 
 .custom-field-row input[type="checkbox"] {
+  transform: scale(1.2);
   margin: 0;
 }
 
