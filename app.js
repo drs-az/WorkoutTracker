@@ -49,7 +49,7 @@ function renderPlan() {
       <button type="submit">Save Workout</button>
     </form>
     <br>
-    <button onclick="renderAddExerciseForm()"+ Add New Exercise</button>
+    <button onclick="renderAddExerciseForm()">âž• Add New Exercise</button>
   `;
 
   document.getElementById('exercise-form').onsubmit = function (e) {
@@ -99,7 +99,7 @@ function renderAddExerciseForm() {
       <button type="submit">Add Exercise</button>
     </form>
     <br>
-    <button onclick="renderPlan()"Back to Workout Logger</button>
+    <button onclick="renderPlan()">â¬… Back to Workout Logger</button>
   `;
 
   document.getElementById('new-exercise-form').onsubmit = function(e) {
