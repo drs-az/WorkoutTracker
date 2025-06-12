@@ -105,7 +105,7 @@ function renderAddExerciseForm() {
       <input type="text" id="custom-exercise-name" required><br><br>
 
       <div>
-        <strong>Select Fields:</strong>
+        <strong>Select Fields:</strong><br>
         <div class="custom-field-row">
           <input type="checkbox" id="field-weight" value="weight">
           <label for="field-weight">Weight</label>
