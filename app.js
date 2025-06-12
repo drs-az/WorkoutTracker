@@ -1,4 +1,5 @@
 let customExercises = JSON.parse(localStorage.getItem('customExercises')) || {};
+let editingLogId = null;
 
 function getOrAskName() {
   let name = localStorage.getItem('userFirstName');
@@ -57,19 +58,32 @@ function renderPlan() {
     const exercise = document.getElementById('exercise-select').value;
     const sets = document.querySelectorAll('.set-input');
 
-    const log = {
-      id: Date.now(),
-      date: new Date().toLocaleDateString(),
-      exercise,
-      sets: Array.from(sets).map(set => ({
-        reps: set.querySelector('.reps')?.value || null,
-        weight: set.querySelector('.weight')?.value || null,
-        time: set.querySelector('.time')?.value || null
-      }))
-    };
-
     const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
-    logs.unshift(log);
+
+    const setData = Array.from(sets).map(set => ({
+      reps: set.querySelector('.reps')?.value || null,
+      weight: set.querySelector('.weight')?.value || null,
+      time: set.querySelector('.time')?.value || null
+    }));
+
+      if (editingLogId !== null) {
+        const index = logs.findIndex(l => l.id === editingLogId);
+        if (index !== -1) {
+          logs[index] = { ...logs[index], exercise, sets: setData };
+        }
+        editingLogId = null;
+        const submitBtn = document.querySelector('#exercise-form button[type="submit"]');
+        if (submitBtn) submitBtn.textContent = 'Save Workout';
+      } else {
+      const log = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString(),
+        exercise,
+        sets: setData
+      };
+      logs.unshift(log);
+    }
+
     localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs));
 
     renderLogs();
@@ -229,6 +243,8 @@ function editLog(id) {
   const log = logs.find(l => l.id === id);
   if (!log) return;
 
+  editingLogId = id;
+
   document.getElementById('exercise-select').value = log.exercise;
   document.getElementById('set-count').value = log.sets.length;
   generateSetInputs();
@@ -243,7 +259,8 @@ function editLog(id) {
     });
   }, 0);
 
-  deleteLog(id);
+  const submitBtn = document.querySelector('#exercise-form button[type="submit"]');
+  if (submitBtn) submitBtn.textContent = 'Update Workout';
 }
 
 window.onload = () => {
