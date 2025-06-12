@@ -5,7 +5,8 @@ self.addEventListener('install', event => {
         'index.html',
         'style.css',
         'app.js',
-        'manifest.json'
+        'manifest.json',
+        '185-1851780_cartman-beefcake-eric-cartman-beefcake.png'
       ]);
     })
   );

@@ -104,6 +104,7 @@ li button:hover {
 .custom-field-row input[type="checkbox"] {
   margin: 0;
   transform: scale(1.2);
+  width: auto;
 }
 
 
