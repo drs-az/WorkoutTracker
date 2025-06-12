@@ -63,7 +63,9 @@ function renderPlan() {
     const setData = Array.from(sets).map(set => ({
       reps: set.querySelector('.reps')?.value || null,
       weight: set.querySelector('.weight')?.value || null,
-      time: set.querySelector('.time')?.value || null
+      time: set.querySelector('.time')?.value || null,
+      seatPosition: set.querySelector('.seat-position')?.value || null,
+      notes: set.querySelector('.notes')?.value || null
     }));
 
       if (editingLogId !== null) {
@@ -122,6 +124,14 @@ function renderAddExerciseForm() {
           <input type="checkbox" id="field-time-seconds" value="time-seconds">
           <label for="field-time-seconds">Time (seconds)</label>
         </div>
+        <div class="custom-field-row">
+          <input type="checkbox" id="field-seat-position" value="seat-position">
+          <label for="field-seat-position">Seat Position</label>
+        </div>
+        <div class="custom-field-row">
+          <input type="checkbox" id="field-notes" value="notes">
+          <label for="field-notes">Notes</label>
+        </div>
       </div><br>
 
       <button type="submit">Add Exercise</button>
@@ -169,6 +179,12 @@ function generateSetInputs() {
     if (fields.includes('time-seconds')) {
       inputs += `<div class="set-input-row"><label>Seconds: <input type="number" class="time" required></label></div>`;
     }
+    if (fields.includes('seat-position')) {
+      inputs += `<div class="set-input-row"><label>Seat Position: <input type="text" class="seat-position"></label></div>`;
+    }
+    if (fields.includes('notes')) {
+      inputs += `<div class="set-input-row"><label>Notes: <input type="text" class="notes"></label></div>`;
+    }
 
     inputContainer.innerHTML += `
       <div class="set-input">
@@ -206,6 +222,8 @@ function renderLogs() {
           if (s.reps) parts.push(`${s.reps} reps`);
           if (s.weight) parts.push(`@ ${s.weight} lbs`);
           if (s.time) parts.push(`${s.time} sec`);
+          if (s.seatPosition) parts.push(`Seat ${s.seatPosition}`);
+          if (s.notes) parts.push(`Notes: ${s.notes}`);
           return `Set ${i + 1}: ${parts.join(' ')}`;
         })
         .join(' | ');
@@ -256,6 +274,8 @@ function editLog(id) {
       if (s.weight) input.querySelector('.weight').value = s.weight;
       if (s.reps) input.querySelector('.reps').value = s.reps;
       if (s.time) input.querySelector('.time').value = s.time;
+      if (s.seatPosition) input.querySelector('.seat-position').value = s.seatPosition;
+      if (s.notes) input.querySelector('.notes').value = s.notes;
     });
   }, 0);
 
