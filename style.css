@@ -140,3 +140,12 @@ li button:hover {
   margin-top: 1rem;
   margin-bottom: 2rem;
 }
+
+/* === Video Link === */
+#video-link a {
+  color: #fff;
+}
+
+#video-link button {
+  margin-left: 0.5rem;
+}
