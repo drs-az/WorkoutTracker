@@ -49,7 +49,7 @@ function renderPlan() {
   container.innerHTML = `
     <h2>Log a New Exercise</h2>
     <form class="exercise-log-form" id="exercise-form">
-      <label for="exercise-select">Select Exercise (tap to reveal the exercist list):</label>
+      <label for="exercise-select">Select Exercise (tap to reveal the exercise list):</label>
       <select id="exercise-select">
         ${Object.keys(getAllExercises()).map(e => `<option value="${e}">${e}</option>`).join('')}
       </select><br>
