@@ -182,25 +182,7 @@ function generateSetInputs() {
   const videoLink = document.getElementById('video-link');
   if (videoLink) {
     const url = getExerciseVideo(select.value);
-    const isDefault = defaultExercises.hasOwnProperty(select.value);
-    const editBtn = isDefault ? '<button type="button" id="edit-video-link">Edit Video URL</button>' : '';
-    videoLink.innerHTML = url ? `<a href="${url}" target="_blank" id="exercise-video-link">Exercise Demonstration Video</a> ${editBtn}` : editBtn;
-
-    if (isDefault) {
-      document.getElementById('edit-video-link').onclick = () => {
-        const current = getExerciseVideo(select.value);
-        const newUrl = prompt('Enter video URL', current);
-        if (newUrl !== null) {
-          if (newUrl.trim()) {
-            customExerciseVideos[select.value] = newUrl.trim();
-          } else {
-            delete customExerciseVideos[select.value];
-          }
-          localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
-          generateSetInputs();
-        }
-      };
-    }
+main
   }
 
   const count = parseInt(countInput.value);
