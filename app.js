@@ -53,7 +53,8 @@ function renderPlan() {
       <select id="exercise-select">
         ${Object.keys(getAllExercises()).map(e => `<option value="${e}">${e}</option>`).join('')}
       </select><br>
-      <div id="video-link"></div><br>
+      <div id="video-link"></div>
+      <button type="button" id="edit-video-link">Edit Video URL</button><br>
 
       <label for="set-count">How many sets?</label>
       <input type="number" id="set-count" value="3" min="1" max="10"><br><br>
@@ -109,6 +110,7 @@ function renderPlan() {
   generateSetInputs();
   document.getElementById('set-count').addEventListener('input', generateSetInputs);
   document.getElementById('exercise-select').addEventListener('change', generateSetInputs);
+  document.getElementById('edit-video-link').addEventListener('click', editVideoLink);
 }
 
 function renderAddExerciseForm() {
@@ -174,7 +176,7 @@ function renderAddExerciseForm() {
   };
 }
 
-function generateSetInputs() {
+function generateSetInputs(linkOnly = false) {
   const select = document.getElementById('exercise-select');
   const countInput = document.getElementById('set-count');
   if (!select || !countInput) return;
@@ -184,6 +186,8 @@ function generateSetInputs() {
     const url = getExerciseVideo(select.value);
     videoLink.innerHTML = url ? `<a href="${url}" target="_blank">Exercise Demonstration Video</a>` : '';
   }
+
+  if (linkOnly) return;
 
   const count = parseInt(countInput.value);
   const exercise = select.value;
@@ -220,6 +224,23 @@ function generateSetInputs() {
       </div>
     `;
   }
+}
+
+function editVideoLink() {
+  const select = document.getElementById('exercise-select');
+  if (!select) return;
+  const exercise = select.value;
+  const current = getExerciseVideo(exercise);
+  const url = prompt('Enter video URL:', current);
+  if (url === null) return;
+
+  if (url.trim()) {
+    customExerciseVideos[exercise] = url.trim();
+  } else {
+    delete customExerciseVideos[exercise];
+  }
+  localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  generateSetInputs(true);
 }
 
 function renderLogs() {
