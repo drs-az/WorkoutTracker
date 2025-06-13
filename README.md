@@ -7,7 +7,7 @@ This is a simple progressive web application (PWA) for tracking workouts. It run
 - Log workouts with multiple sets for built‑in or custom exercises.
 - Edit and delete previously saved logs.
 - Custom exercises with selectable fields such as weight, reps and time, and an optional demonstration video link.
-- Optional video links for each exercise.
+- Optional video links for each exercise, including editable links for default exercises via the "Edit Video URL" button.
 - Offline support via a service worker.
 
 ## Usage

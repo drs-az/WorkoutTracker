@@ -182,7 +182,7 @@ function generateSetInputs() {
   const videoLink = document.getElementById('video-link');
   if (videoLink) {
     const url = getExerciseVideo(select.value);
-    videoLink.innerHTML = url ? `<a href="${url}" target="_blank">Exercise Demonstration Video</a>` : '';
+main
   }
 
   const count = parseInt(countInput.value);
