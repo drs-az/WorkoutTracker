@@ -174,6 +174,19 @@ function renderAddExerciseForm() {
   };
 }
 
+function editCustomExerciseVideo(name) {
+  const current = customExerciseVideos[name] || '';
+  const url = prompt(`Edit video URL for ${name}:`, current);
+  if (url === null) return; // cancelled
+  if (url.trim()) {
+    customExerciseVideos[name] = url.trim();
+  } else {
+    delete customExerciseVideos[name];
+  }
+  localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  generateSetInputs();
+}
+
 function generateSetInputs() {
   const select = document.getElementById('exercise-select');
   const countInput = document.getElementById('set-count');
@@ -182,7 +195,16 @@ function generateSetInputs() {
   const videoLink = document.getElementById('video-link');
   if (videoLink) {
     const url = getExerciseVideo(select.value);
-    videoLink.innerHTML = url ? `<a href="${url}" target="_blank">Exercise Demonstration Video</a>` : '';
+    const isCustom = !!customExercises[select.value];
+    let html = url ? `<a href="${url}" target="_blank">Exercise Demonstration Video</a>` : '';
+    if (isCustom) {
+      html += ` <button type="button" id="edit-video-btn">Edit Video URL</button>`;
+    }
+    videoLink.innerHTML = html;
+    if (isCustom) {
+      const btn = document.getElementById('edit-video-btn');
+      if (btn) btn.onclick = () => editCustomExerciseVideo(select.value);
+    }
   }
 
   const count = parseInt(countInput.value);
