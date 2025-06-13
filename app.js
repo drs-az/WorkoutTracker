@@ -118,8 +118,8 @@ function renderPlan() {
   };
 
   generateSetInputs();
-  document.getElementById('set-count').addEventListener('input', generateSetInputs);
-  document.getElementById('exercise-select').addEventListener('change', generateSetInputs);
+  document.getElementById('set-count').addEventListener('input', () => generateSetInputs());
+  document.getElementById('exercise-select').addEventListener('change', () => generateSetInputs());
   document.getElementById('edit-video-link').addEventListener('click', editVideoLink);
 }
 
