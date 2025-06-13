@@ -189,7 +189,7 @@ function renderAddExerciseForm() {
   };
 }
 
-main
+function generateSetInputs(linkOnly = false) {
   const select = document.getElementById('exercise-select');
   const countInput = document.getElementById('set-count');
   if (!select || !countInput) return;
@@ -197,7 +197,7 @@ main
   const videoLink = document.getElementById('video-link');
   if (videoLink) {
     const url = getExerciseVideo(select.value);
-main
+    videoLink.innerHTML = url ? `<a href="${url}" target="_blank">Exercise Video</a>` : '';
   }
 
   if (linkOnly) return;
