@@ -44,6 +44,16 @@ function getExerciseVideo(name) {
   return customExerciseVideos[name] || defaultExerciseVideos[name] || '';
 }
 
+function sanitizeVideoUrl(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return url;
+    }
+  } catch (_) {}
+  return '';
+}
+
 function renderPlan() {
   const container = document.getElementById('workout-plan');
   container.innerHTML = `
@@ -159,17 +169,20 @@ function renderAddExerciseForm() {
   document.getElementById('new-exercise-form').onsubmit = function(e) {
     e.preventDefault();
 
-    const name = document.getElementById('custom-exercise-name').value.trim();
-    const video = document.getElementById('custom-exercise-video').value.trim();
-    const fields = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-    if (!name || fields.length === 0) return;
+  const name = document.getElementById('custom-exercise-name').value.trim();
+  const rawVideo = document.getElementById('custom-exercise-video').value.trim();
+  const video = sanitizeVideoUrl(rawVideo);
+  const fields = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+  if (!name || fields.length === 0) return;
 
     customExercises[name] = fields;
     localStorage.setItem('customExercises', JSON.stringify(customExercises));
-    if (video) {
-      customExerciseVideos[name] = video;
-      localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
-    }
+  if (video) {
+    customExerciseVideos[name] = video;
+    localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  } else if (rawVideo) {
+    alert('Video URL must start with http:// or https://');
+  }
     renderPlan();
   };
 }
