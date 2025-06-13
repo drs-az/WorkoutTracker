@@ -63,8 +63,8 @@ function renderPlan() {
       <select id="exercise-select">
         ${Object.keys(getAllExercises()).map(e => `<option value="${e}">${e}</option>`).join('')}
       </select><br>
-      <div id="video-link"></div>
-      <button type="button" id="edit-video-link">Edit Video URL</button><br>
+      <div id="video-link"></div><br>
+      <button type="button" id="edit-video-link">Edit Video URL</button><br><br>
 
       <label for="set-count">How many sets?</label>
       <input type="number" id="set-count" value="3" min="1" max="10"><br><br>
