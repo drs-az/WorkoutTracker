@@ -1,4 +1,5 @@
 let customExercises = JSON.parse(localStorage.getItem('customExercises')) || {};
+let customExerciseVideos = JSON.parse(localStorage.getItem('customExerciseVideos')) || {};
 let editingLogId = null;
 
 function getOrAskName() {
@@ -28,8 +29,19 @@ const defaultExercises = {
   'Crunches': ['reps']
 };
 
+const defaultExerciseVideos = Object.fromEntries(
+  Object.keys(defaultExercises).map(name => [
+    name,
+    `https://www.youtube.com/results?search_query=${encodeURIComponent(name + ' exercise')}`
+  ])
+);
+
 function getAllExercises() {
   return { ...defaultExercises, ...customExercises };
+}
+
+function getExerciseVideo(name) {
+  return customExerciseVideos[name] || defaultExerciseVideos[name] || '';
 }
 
 function renderPlan() {
@@ -40,7 +52,8 @@ function renderPlan() {
       <label for="exercise-select">Select Exercise (tap to reveal the exercist list):</label>
       <select id="exercise-select">
         ${Object.keys(getAllExercises()).map(e => `<option value="${e}">${e}</option>`).join('')}
-      </select><br><br>
+      </select><br>
+      <div id="video-link"></div><br>
 
       <label for="set-count">How many sets?</label>
       <input type="number" id="set-count" value="3" min="1" max="10"><br><br>
@@ -106,6 +119,9 @@ function renderAddExerciseForm() {
       <label for="custom-exercise-name">Exercise Name:</label>
       <input type="text" id="custom-exercise-name" required><br><br>
 
+      <label for="custom-exercise-video">Video URL:</label>
+      <input type="url" id="custom-exercise-video" placeholder="https://"><br><br>
+
       <div>
         <strong>Select Fields:</strong><br><br>
         <div class="custom-field-row">
@@ -144,11 +160,16 @@ function renderAddExerciseForm() {
     e.preventDefault();
 
     const name = document.getElementById('custom-exercise-name').value.trim();
+    const video = document.getElementById('custom-exercise-video').value.trim();
     const fields = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
     if (!name || fields.length === 0) return;
 
     customExercises[name] = fields;
     localStorage.setItem('customExercises', JSON.stringify(customExercises));
+    if (video) {
+      customExerciseVideos[name] = video;
+      localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+    }
     renderPlan();
   };
 }
@@ -157,6 +178,12 @@ function generateSetInputs() {
   const select = document.getElementById('exercise-select');
   const countInput = document.getElementById('set-count');
   if (!select || !countInput) return;
+
+  const videoLink = document.getElementById('video-link');
+  if (videoLink) {
+    const url = getExerciseVideo(select.value);
+    videoLink.innerHTML = url ? `<a href="${url}" target="_blank">Exercise Demonstration Video</a>` : '';
+  }
 
   const count = parseInt(countInput.value);
   const exercise = select.value;
