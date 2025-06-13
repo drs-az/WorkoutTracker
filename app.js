@@ -64,7 +64,7 @@ function renderPlan() {
         ${Object.keys(getAllExercises()).map(e => `<option value="${e}">${e}</option>`).join('')}
       </select><br>
       <div id="video-link"></div><br>
-      <button type="button" id="edit-video-link">Edit Video URL</button><br><br>
+      <a href="#" id="edit-video-link">Edit Video URL</a><br><br>
 
       <label for="set-count">How many sets?</label>
       <input type="number" id="set-count" value="3" min="1" max="10"><br><br>
@@ -120,7 +120,7 @@ function renderPlan() {
   generateSetInputs();
   document.getElementById('set-count').addEventListener('input', () => generateSetInputs());
   document.getElementById('exercise-select').addEventListener('change', () => generateSetInputs());
-  document.getElementById('edit-video-link').addEventListener('click', editVideoLink);
+  document.getElementById('edit-video-link').addEventListener('click', (e) => { e.preventDefault(); editVideoLink(); });
 }
 
 function renderAddExerciseForm() {
