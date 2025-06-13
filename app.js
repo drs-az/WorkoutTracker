@@ -174,6 +174,19 @@ function renderAddExerciseForm() {
   };
 }
 
+function editCustomExerciseVideo(name) {
+  const current = customExerciseVideos[name] || '';
+  const url = prompt(`Edit video URL for ${name}:`, current);
+  if (url === null) return; // cancelled
+  if (url.trim()) {
+    customExerciseVideos[name] = url.trim();
+  } else {
+    delete customExerciseVideos[name];
+  }
+  localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  generateSetInputs();
+}
+
 function generateSetInputs() {
   const select = document.getElementById('exercise-select');
   const countInput = document.getElementById('set-count');
