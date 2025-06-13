@@ -195,16 +195,7 @@ function generateSetInputs() {
   const videoLink = document.getElementById('video-link');
   if (videoLink) {
     const url = getExerciseVideo(select.value);
-    const isCustom = !!customExercises[select.value];
-    let html = url ? `<a href="${url}" target="_blank">Exercise Demonstration Video</a>` : '';
-    if (isCustom) {
-      html += ` <button type="button" id="edit-video-btn">Edit Video URL</button>`;
-    }
-    videoLink.innerHTML = html;
-    if (isCustom) {
-      const btn = document.getElementById('edit-video-btn');
-      if (btn) btn.onclick = () => editCustomExerciseVideo(select.value);
-    }
+main
   }
 
   const count = parseInt(countInput.value);
