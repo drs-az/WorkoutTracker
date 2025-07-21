@@ -402,6 +402,21 @@ function clearAllLogs() {
   }
 }
 
+function showSection(section) {
+  const plan = document.getElementById('workout-plan');
+  const history = document.getElementById('log-history');
+  const settings = document.getElementById('settings');
+  if (!plan || !history || !settings) return;
+
+  plan.style.display = section === 'log' ? 'block' : 'none';
+  history.style.display = section === 'history' ? 'block' : 'none';
+  settings.style.display = section === 'settings' ? 'block' : 'none';
+
+  document.getElementById('nav-log').classList.toggle('active', section === 'log');
+  document.getElementById('nav-history').classList.toggle('active', section === 'history');
+  document.getElementById('nav-settings').classList.toggle('active', section === 'settings');
+}
+
 window.onload = () => {
   getOrAskName();
   renderPlan();
@@ -416,6 +431,14 @@ window.onload = () => {
   });
   const clearBtn = document.getElementById('clear-logs');
   if (clearBtn) clearBtn.onclick = clearAllLogs;
+
+  const navLog = document.getElementById('nav-log');
+  const navHistory = document.getElementById('nav-history');
+  const navSettings = document.getElementById('nav-settings');
+  if (navLog) navLog.onclick = () => showSection('log');
+  if (navHistory) navHistory.onclick = () => { renderLogs(); showSection('history'); };
+  if (navSettings) navSettings.onclick = () => showSection('settings');
+  showSection('log');
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
