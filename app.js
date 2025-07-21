@@ -443,10 +443,39 @@ function clearAllLogs() {
   }
 }
 
+function showSection(section) {
+  const sections = {
+    log: document.getElementById('workout-plan'),
+    history: document.getElementById('log-history'),
+    settings: document.getElementById('settings')
+  };
+  Object.entries(sections).forEach(([key, el]) => {
+    if (el) el.style.display = key === section ? 'block' : 'none';
+  });
+
+  const buttons = {
+    log: document.getElementById('nav-log'),
+    history: document.getElementById('nav-history'),
+    settings: document.getElementById('nav-settings')
+  };
+  Object.entries(buttons).forEach(([key, btn]) => {
+    if (btn) btn.classList.toggle('active', key === section);
+  });
+}
+
 window.onload = () => {
   getOrAskName();
   renderPlan();
   renderLogs();
+
+  showSection('log');
+
+  const navLog = document.getElementById('nav-log');
+  const navHistory = document.getElementById('nav-history');
+  const navSettings = document.getElementById('nav-settings');
+  if (navLog) navLog.onclick = () => { showSection('log'); renderPlan(); };
+  if (navHistory) navHistory.onclick = () => { showSection('history'); renderLogs(); };
+  if (navSettings) navSettings.onclick = () => { showSection('settings'); };
 
   const exportBtn = document.getElementById('export-logs');
   if (exportBtn) exportBtn.onclick = exportLogs;
