@@ -270,10 +270,13 @@ function editVideoLink() {
   const url = prompt('Enter video URL:', current);
   if (url === null) return;
 
-  if (url.trim()) {
-    customExerciseVideos[exercise] = url.trim();
+  const sanitized = sanitizeVideoUrl(url.trim());
+
+  if (sanitized) {
+    customExerciseVideos[exercise] = sanitized;
   } else {
     delete customExerciseVideos[exercise];
+    if (url.trim()) alert('Video URL must start with http:// or https://');
   }
   localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
   generateSetInputs(true);
