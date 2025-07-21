@@ -395,6 +395,44 @@ function importLogsFromFile(file) {
   reader.readAsText(file);
 }
 
+function importExercisesFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const incoming = JSON.parse(e.target.result);
+      if (typeof incoming !== 'object' || incoming === null) throw new Error();
+
+      if (incoming.customExercises && typeof incoming.customExercises === 'object') {
+        const existing = JSON.parse(localStorage.getItem('customExercises')) || {};
+        for (const [name, fields] of Object.entries(incoming.customExercises)) {
+          if (Array.isArray(fields) && fields.every(f => typeof f === 'string')) {
+            existing[name] = fields;
+          }
+        }
+        customExercises = existing;
+        localStorage.setItem('customExercises', JSON.stringify(existing));
+      }
+
+      if (incoming.customExerciseVideos && typeof incoming.customExerciseVideos === 'object') {
+        const existingVideos = JSON.parse(localStorage.getItem('customExerciseVideos')) || {};
+        for (const [name, url] of Object.entries(incoming.customExerciseVideos)) {
+          const sanitized = sanitizeVideoUrl(url);
+          if (sanitized) {
+            existingVideos[name] = sanitized;
+          }
+        }
+        customExerciseVideos = existingVideos;
+        localStorage.setItem('customExerciseVideos', JSON.stringify(existingVideos));
+      }
+
+      renderPlan();
+    } catch (_) {
+      alert('Invalid exercise file');
+    }
+  };
+  reader.readAsText(file);
+}
+
 function clearAllLogs() {
   if (confirm('Delete all workout logs?')) {
     localStorage.removeItem('detailedWorkoutLogs');
