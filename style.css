@@ -159,3 +159,13 @@ li button:hover {
   padding: 0;
   cursor: pointer;
 }
+
+/* === Settings Section === */
+#settings {
+  margin-top: 2rem;
+}
+
+#settings input[type="file"] {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}

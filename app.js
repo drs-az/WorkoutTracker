@@ -8,7 +8,8 @@ function getOrAskName() {
     name = prompt('Welcome! What is your first name?');
     if (name) localStorage.setItem('userFirstName', name);
   }
-  document.getElementById('app-title').textContent = `${name || 'My'}'s Workout Tracker`;
+  const title = name ? `${name}'s Workout Tracker` : 'Workout Tracker';
+  document.getElementById('app-title').textContent = title;
 }
 
 const defaultExercises = {
@@ -74,6 +75,7 @@ function renderPlan() {
     </form>
     <br>
     <button onclick="renderAddExerciseForm()">Add New Exercise</button>
+    <button onclick="renderManageExercises()">Manage Custom Exercises</button>
   `;
 
   document.getElementById('exercise-form').onsubmit = function (e) {
@@ -186,7 +188,28 @@ function renderAddExerciseForm() {
     alert('Video URL must start with http:// or https://');
   }
     renderPlan();
-  };
+  }; 
+}
+
+function renderManageExercises() {
+  const container = document.getElementById('workout-plan');
+  const names = Object.keys(customExercises);
+  const list = names.map(n => `
+      <li>${n} <button onclick="deleteCustomExercise('${n.replace(/"/g, '&quot;')}')">Delete</button></li>`).join('');
+  container.innerHTML = `
+    <h2>Manage Custom Exercises</h2>
+    <ul>${list || '<li>No custom exercises added.</li>'}</ul>
+    <br>
+    <button onclick="renderPlan()">Back to Workout Logger</button>
+  `;
+}
+
+function deleteCustomExercise(name) {
+  delete customExercises[name];
+  delete customExerciseVideos[name];
+  localStorage.setItem('customExercises', JSON.stringify(customExercises));
+  localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  renderManageExercises();
 }
 
 function generateSetInputs(linkOnly = false) {
@@ -344,10 +367,55 @@ function editLog(id) {
   if (submitBtn) submitBtn.textContent = 'Update Workout';
 }
 
+function exportLogs() {
+  const data = localStorage.getItem('detailedWorkoutLogs') || '[]';
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'workout-logs.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importLogsFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const incoming = JSON.parse(e.target.result);
+      if (!Array.isArray(incoming)) throw new Error();
+      const current = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
+      const combined = [...incoming, ...current];
+      localStorage.setItem('detailedWorkoutLogs', JSON.stringify(combined));
+      renderLogs();
+    } catch (_) {
+      alert('Invalid workout log file');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function clearAllLogs() {
+  if (confirm('Delete all workout logs?')) {
+    localStorage.removeItem('detailedWorkoutLogs');
+    renderLogs();
+  }
+}
+
 window.onload = () => {
   getOrAskName();
   renderPlan();
   renderLogs();
+
+  const exportBtn = document.getElementById('export-logs');
+  if (exportBtn) exportBtn.onclick = exportLogs;
+  const importInput = document.getElementById('import-logs');
+  if (importInput) importInput.addEventListener('change', e => {
+    if (e.target.files[0]) importLogsFromFile(e.target.files[0]);
+    e.target.value = '';
+  });
+  const clearBtn = document.getElementById('clear-logs');
+  if (clearBtn) clearBtn.onclick = clearAllLogs;
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
