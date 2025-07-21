@@ -8,7 +8,25 @@ function getOrAskName() {
     name = prompt('Welcome! What is your first name?');
     if (name) localStorage.setItem('userFirstName', name);
   }
-  document.getElementById('app-title').textContent = `${name || 'My'}'s Workout Tracker`;
+  const title = name ? `${name}'s Workout Tracker` : 'Workout Tracker';
+  document.getElementById('app-title').textContent = title;
+}
+
+function loadNameIntoSettings() {
+  const input = document.getElementById('user-name');
+  if (input) input.value = localStorage.getItem('userFirstName') || '';
+}
+
+function saveName() {
+  const input = document.getElementById('user-name');
+  if (!input) return;
+  const name = input.value.trim();
+  if (name) {
+    localStorage.setItem('userFirstName', name);
+  } else {
+    localStorage.removeItem('userFirstName');
+  }
+  getOrAskName();
 }
 
 const defaultExercises = {
@@ -74,6 +92,7 @@ function renderPlan() {
     </form>
     <br>
     <button onclick="renderAddExerciseForm()">Add New Exercise</button>
+    <button onclick="renderManageExercises()">Manage Custom Exercises</button>
   `;
 
   document.getElementById('exercise-form').onsubmit = function (e) {
@@ -186,7 +205,50 @@ function renderAddExerciseForm() {
     alert('Video URL must start with http:// or https://');
   }
     renderPlan();
-  };
+  }; 
+}
+
+function renderManageExercises() {
+  const container = document.getElementById('workout-plan');
+  const names = Object.keys(customExercises);
+  const list = names.map(n => `
+      <li>${n}
+        <button onclick="renameCustomExercise('${n.replace(/"/g, '&quot;')}')">Rename</button>
+        <button onclick="deleteCustomExercise('${n.replace(/"/g, '&quot;')}')">Delete</button>
+      </li>`).join('');
+  container.innerHTML = `
+    <h2>Manage Custom Exercises</h2>
+    <ul>${list || '<li>No custom exercises added.</li>'}</ul>
+    <br>
+    <button onclick="renderPlan()">Back to Workout Logger</button>
+  `;
+}
+
+function deleteCustomExercise(name) {
+  delete customExercises[name];
+  delete customExerciseVideos[name];
+  localStorage.setItem('customExercises', JSON.stringify(customExercises));
+  localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  renderManageExercises();
+}
+
+function renameCustomExercise(name) {
+  const newName = prompt('New exercise name:', name);
+  if (!newName || newName === name) return;
+  if (customExercises[newName]) {
+    alert('Exercise with that name already exists.');
+    return;
+  }
+  customExercises[newName] = customExercises[name];
+  delete customExercises[name];
+  if (customExerciseVideos[name]) {
+    customExerciseVideos[newName] = customExerciseVideos[name];
+    delete customExerciseVideos[name];
+  }
+  localStorage.setItem('customExercises', JSON.stringify(customExercises));
+  localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  renderManageExercises();
+  renderPlan();
 }
 
 function generateSetInputs(linkOnly = false) {
@@ -261,7 +323,11 @@ function renderLogs() {
   const list = document.getElementById('log-list');
   list.innerHTML = '';
 
-  const grouped = logs.reduce((acc, log) => {
+  const filter = document.getElementById('log-filter');
+  const term = filter ? filter.value.toLowerCase() : '';
+  const visibleLogs = logs.filter(l => !term || l.exercise.toLowerCase().includes(term));
+
+  const grouped = visibleLogs.reduce((acc, log) => {
     if (!acc[log.date]) acc[log.date] = [];
     acc[log.date].push(log);
     return acc;
@@ -344,10 +410,122 @@ function editLog(id) {
   if (submitBtn) submitBtn.textContent = 'Update Workout';
 }
 
+function exportLogs() {
+  const data = localStorage.getItem('detailedWorkoutLogs') || '[]';
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'workout-logs.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importLogsFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const incoming = JSON.parse(e.target.result);
+      if (!Array.isArray(incoming)) throw new Error();
+      const current = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
+      const combined = [...incoming, ...current];
+      localStorage.setItem('detailedWorkoutLogs', JSON.stringify(combined));
+      renderLogs();
+    } catch (_) {
+      alert('Invalid workout log file');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function exportExercises() {
+  const data = JSON.stringify({ customExercises, customExerciseVideos });
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'custom-exercises.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importExercisesFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const incoming = JSON.parse(e.target.result);
+      if (!incoming.customExercises || typeof incoming.customExercises !== 'object') throw new Error();
+      customExercises = { ...customExercises, ...incoming.customExercises };
+      customExerciseVideos = { ...customExerciseVideos, ...incoming.customExerciseVideos };
+      localStorage.setItem('customExercises', JSON.stringify(customExercises));
+      localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+      renderPlan();
+    } catch (_) {
+      alert('Invalid custom exercise file');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function clearAllLogs() {
+  if (confirm('Delete all workout logs?')) {
+    localStorage.removeItem('detailedWorkoutLogs');
+    renderLogs();
+  }
+}
+
+function showSection(section) {
+  const plan = document.getElementById('workout-plan');
+  const history = document.getElementById('log-history');
+  const settings = document.getElementById('settings');
+  if (!plan || !history || !settings) return;
+
+  plan.style.display = section === 'log' ? 'block' : 'none';
+  history.style.display = section === 'history' ? 'block' : 'none';
+  settings.style.display = section === 'settings' ? 'block' : 'none';
+
+  if (section === 'settings') loadNameIntoSettings();
+
+  document.getElementById('nav-log').classList.toggle('active', section === 'log');
+  document.getElementById('nav-history').classList.toggle('active', section === 'history');
+  document.getElementById('nav-settings').classList.toggle('active', section === 'settings');
+}
+
 window.onload = () => {
   getOrAskName();
   renderPlan();
   renderLogs();
+  loadNameIntoSettings();
+
+  const exportBtn = document.getElementById('export-logs');
+  if (exportBtn) exportBtn.onclick = exportLogs;
+  const importInput = document.getElementById('import-logs');
+  if (importInput) importInput.addEventListener('change', e => {
+    if (e.target.files[0]) importLogsFromFile(e.target.files[0]);
+    e.target.value = '';
+  });
+  const clearBtn = document.getElementById('clear-logs');
+  if (clearBtn) clearBtn.onclick = clearAllLogs;
+
+  const exportEx = document.getElementById('export-exercises');
+  if (exportEx) exportEx.onclick = exportExercises;
+  const importEx = document.getElementById('import-exercises');
+  if (importEx) importEx.addEventListener('change', e => {
+    if (e.target.files[0]) importExercisesFromFile(e.target.files[0]);
+    e.target.value = '';
+  });
+  const saveNameBtn = document.getElementById('save-name');
+  if (saveNameBtn) saveNameBtn.onclick = saveName;
+  const filterInput = document.getElementById('log-filter');
+  if (filterInput) filterInput.addEventListener('input', renderLogs);
+
+  const navLog = document.getElementById('nav-log');
+  const navHistory = document.getElementById('nav-history');
+  const navSettings = document.getElementById('nav-settings');
+  if (navLog) navLog.onclick = () => showSection('log');
+  if (navHistory) navHistory.onclick = () => { renderLogs(); showSection('history'); };
+  if (navSettings) navSettings.onclick = () => showSection('settings');
+  showSection('log');
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');

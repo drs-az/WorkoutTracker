@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#2d2d2d" />
+  <meta name="theme-color" content="#ffffff" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <title>Workout Tracker</title>
@@ -15,11 +15,31 @@
     <!-- Dynamic form will render here -->
     <div id="workout-plan"></div>
 
-    <div id="log-history">
+  <div id="log-history" style="display:none;">
       <h2>📅 Workout History</h2>
+      <input type="text" id="log-filter" placeholder="Filter by exercise" />
       <ul id="log-list"></ul>
     </div>
+
+    <div id="settings" style="display:none;">
+      <h2>⚙️ Settings</h2>
+      <label for="user-name">First Name:</label>
+      <input type="text" id="user-name" />
+      <button id="save-name">Save Name</button>
+      <hr />
+      <button id="export-logs">Export Logs</button>
+      <input type="file" id="import-logs" accept="application/json">
+      <button id="clear-logs">Clear All Logs</button>
+      <hr />
+      <button id="export-exercises">Export Exercises</button>
+      <input type="file" id="import-exercises" accept="application/json">
+    </div>
   </div>
+  <nav class="bottom-nav">
+    <button id="nav-log" class="active">Log a New Exercise</button>
+    <button id="nav-history">Workout History</button>
+    <button id="nav-settings">Settings</button>
+  </nav>
   <script src="app.js"></script>
 </body>
 </html>
