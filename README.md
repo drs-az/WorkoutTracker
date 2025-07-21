@@ -6,17 +6,21 @@ This is a simple progressive web application (PWA) for tracking workouts. It run
 
 - Log workouts with multiple sets for built‑in or custom exercises.
 - Edit and delete previously saved logs.
+- Bottom navigation menu for **Log**, **History**, and **Settings**.
 - Custom exercises with selectable fields such as weight, reps and time, and an optional demonstration video link.
+- Rename and manage custom exercises after creation.
+- Export or import workout logs and custom exercises for backup.
+- Filter workout history by exercise.
+- Edit and save your name.
 - Offline support via a service worker.
-- Manage custom exercises after creation.
-- Export or import your workout logs for backup.
 
 ## Usage
 
 1. Serve the project using any static web server (for example, `npx serve` or `python -m http.server`).
 2. Open `index.html` in your browser.
-3. The app will prompt for your first name and then allow you to create or edit workout logs.
-4. Use the **Settings** section to export or import logs or to clear all stored data.
+3. Enter your first name when prompted. You can later edit it from **Settings**.
+4. Use the bottom navigation menu to switch between **Log**, **History** (where you can filter by exercise), and **Settings**.
+5. The **Settings** screen lets you export or import workout logs and custom exercises, rename custom exercises, edit your saved name, or clear all data.
 
 All data is saved to the browser's local storage, so it persists between sessions but is specific to the browser you use.
 
