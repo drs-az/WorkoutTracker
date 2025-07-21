@@ -74,7 +74,7 @@ function renderPlan() {
       <button type="submit">Save Workout</button>
     </form>
     <br>
-    <button onclick="renderAddExerciseForm()">Add New Exercise</button><br>
+    <button onclick="renderAddExerciseForm()">Add New Exercise</button><br><br>
     <button onclick="renderManageExercises()">Manage Custom Exercises</button>
   `;
 
