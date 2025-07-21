@@ -1,8 +1,8 @@
 /* === Base Styling === */
 body {
   font-family: sans-serif;
-  background-color: #1f1f1f;
-  color: #ffffff;
+  background-color: #f7f7f7;
+  color: #333;
   margin: 0;
   padding: 0;
 }
@@ -14,7 +14,7 @@ body {
 }
 
 h1, h2, h3 {
-  color: #facc15;
+  color: #2563eb;
 }
 
 /* === Form Elements === */
@@ -24,15 +24,15 @@ textarea, input, select {
   margin-top: 0.5rem;
   margin-bottom: 1rem;
   font-size: 1rem;
-  border: none;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  background-color: #2d2d2d;
-  color: #fff;
+  background-color: #fff;
+  color: #333;
   box-sizing: border-box;
 }
 
 button {
-  background-color: #10b981;
+  background-color: #2563eb;
   color: #fff;
   border: none;
   padding: 0.5rem 1rem;
@@ -42,7 +42,7 @@ button {
 }
 
 button:hover {
-  background-color: #059669;
+  background-color: #1d4ed8;
 }
 
 /* === List Styling === */
@@ -54,8 +54,10 @@ ul {
 li {
   margin-bottom: 0.5rem;
   padding: 0.5rem;
-  background-color: #2d2d2d;
+  background-color: #fff;
+  border: 1px solid #ddd;
   border-radius: 5px;
+  color: #333;
 }
 
 /* === Workout Log Buttons === */
@@ -85,7 +87,7 @@ li button:hover {
 /* === Toggle Button === */
 .toggle-button {
   background: none;
-  color: #facc15;
+  color: #2563eb;
   border: none;
   font-weight: bold;
   cursor: pointer;
@@ -98,7 +100,7 @@ li button:hover {
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
-  color: #fff;
+  color: #333;
 }
 
 .custom-field-row input[type="checkbox"] {
@@ -111,10 +113,11 @@ li button:hover {
 
 /* === Set Input Blocks === */
 .set-input {
-  background-color: #333;
+  background-color: #fff;
   padding: 0.5rem;
   margin-bottom: 1rem;
   border-radius: 5px;
+  border: 1px solid #ddd;
   box-sizing: border-box;
   width: 100%;
 }
@@ -143,7 +146,7 @@ li button:hover {
 
 /* === Video Link === */
 #video-link a {
-  background-color: #10b981;
+  background-color: #2563eb;
   color: #fff;
   padding: 0.5rem 1rem;
   border-radius: 5px;
@@ -152,10 +155,47 @@ li button:hover {
 }
 
 #edit-video-link {
-  color: #fff;
+  color: #2563eb;
   text-decoration: underline;
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
+}
+
+/* === Settings Section === */
+#settings {
+  margin-top: 2rem;
+}
+
+#settings input[type="file"] {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* === Bottom Navigation === */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background-color: #ffffff;
+  border-top: 1px solid #ddd;
+  padding: 0.5rem;
+  justify-content: space-around;
+}
+
+.bottom-nav button {
+  flex: 1;
+  margin: 0 0.25rem;
+}
+
+.bottom-nav button.active {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+.container {
+  padding-bottom: 4rem; /* avoid nav overlap */
 }
