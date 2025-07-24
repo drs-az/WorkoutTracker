@@ -11,6 +11,8 @@ This is a simple progressive web application (PWA) for tracking workouts. It run
 - Custom exercises with selectable fields such as weight, reps and time, and an optional demonstration video link.
 - Rename and manage custom exercises after creation.
 - Export or import workout logs and custom exercises for backup.
+- Automatic JSON backup download whenever you save data.
+- Import a full backup to restore settings, logs and exercises.
 - Filter workout history by exercise.
 - Edit and save your name.
 - Offline support via a service worker.
@@ -21,7 +23,9 @@ This is a simple progressive web application (PWA) for tracking workouts. It run
 2. Open `index.html` in your browser.
 3. Enter your first name when prompted. You can later edit it from **Settings**.
 4. Use the bottom navigation menu to switch between **Log**, **History** (where you can filter by exercise), and **Settings**.
-5. The **Settings** screen lets you export or import workout logs and custom exercises, rename custom exercises, edit your saved name, or clear all data.
+5. The **Settings** screen lets you export logs, import logs, restore from a backup file, rename custom exercises, edit your saved name, or clear all data.
+
+Every time you save settings, logs, or exercises a JSON backup file is automatically downloaded. Keep these files somewhere safe so you can restore them later using **Import from Backup**.
 
 All data is saved to the browser's local storage, so it persists between sessions but is specific to the browser you use.
 

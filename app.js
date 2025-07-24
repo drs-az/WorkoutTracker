@@ -2,11 +2,35 @@ let customExercises = JSON.parse(localStorage.getItem('customExercises')) || {};
 let customExerciseVideos = JSON.parse(localStorage.getItem('customExerciseVideos')) || {};
 let editingLogId = null;
 
+function backupLocalData() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    data[key] = localStorage.getItem(key);
+  }
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `workout-backup-${ts}.json`;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function getOrAskName() {
   let name = localStorage.getItem('userFirstName');
   if (!name) {
     name = prompt('Welcome! What is your first name?');
-    if (name) localStorage.setItem('userFirstName', name);
+    if (name) {
+      localStorage.setItem('userFirstName', name);
+      backupLocalData();
+    }
   }
   const title = name ? `${name}'s Workout Tracker` : 'Workout Tracker';
   document.getElementById('app-title').textContent = title;
@@ -113,6 +137,7 @@ function renderPlan() {
     }
 
     localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs));
+    backupLocalData();
 
     renderLogs();
     document.getElementById('set-inputs').innerHTML = '';
@@ -181,9 +206,11 @@ function renderAddExerciseForm() {
 
     customExercises[name] = fields;
     localStorage.setItem('customExercises', JSON.stringify(customExercises));
+    backupLocalData();
   if (video) {
     customExerciseVideos[name] = video;
     localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+    backupLocalData();
   } else if (rawVideo) {
     alert('Video URL must start with http:// or https://');
   }
@@ -209,6 +236,7 @@ function deleteCustomExercise(name) {
   delete customExerciseVideos[name];
   localStorage.setItem('customExercises', JSON.stringify(customExercises));
   localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  backupLocalData();
   renderManageExercises();
 }
 
@@ -279,6 +307,7 @@ function editVideoLink() {
     if (url.trim()) alert('Video URL must start with http:// or https://');
   }
   localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
+  backupLocalData();
   generateSetInputs(true);
 }
 
@@ -340,6 +369,7 @@ function deleteLog(id) {
   let logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
   logs = logs.filter(log => log.id !== id);
   localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs));
+  backupLocalData();
   renderLogs();
 }
 
@@ -390,9 +420,33 @@ function importLogsFromFile(file) {
       const current = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
       const combined = [...incoming, ...current];
       localStorage.setItem('detailedWorkoutLogs', JSON.stringify(combined));
+      backupLocalData();
       renderLogs();
     } catch (_) {
       alert('Invalid workout log file');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function restoreBackupFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (typeof data !== 'object' || data === null) throw new Error();
+      for (const [k, v] of Object.entries(data)) {
+        localStorage.setItem(k, v);
+      }
+      // reload local variables
+      customExercises = JSON.parse(localStorage.getItem('customExercises')) || {};
+      customExerciseVideos = JSON.parse(localStorage.getItem('customExerciseVideos')) || {};
+      renderPlan();
+      renderLogs();
+      getOrAskName();
+      alert('Backup restored successfully');
+    } catch (_) {
+      alert('Invalid backup file');
     }
   };
   reader.readAsText(file);
@@ -414,6 +468,7 @@ function importExercisesFromFile(file) {
         }
         customExercises = existing;
         localStorage.setItem('customExercises', JSON.stringify(existing));
+        backupLocalData();
       }
 
       if (incoming.customExerciseVideos && typeof incoming.customExerciseVideos === 'object') {
@@ -426,6 +481,7 @@ function importExercisesFromFile(file) {
         }
         customExerciseVideos = existingVideos;
         localStorage.setItem('customExerciseVideos', JSON.stringify(existingVideos));
+        backupLocalData();
       }
 
       renderPlan();
@@ -439,6 +495,7 @@ function importExercisesFromFile(file) {
 function clearAllLogs() {
   if (confirm('Delete all workout logs?')) {
     localStorage.removeItem('detailedWorkoutLogs');
+    backupLocalData();
     renderLogs();
   }
 }
@@ -482,6 +539,11 @@ window.onload = () => {
   const importInput = document.getElementById('import-logs');
   if (importInput) importInput.addEventListener('change', e => {
     if (e.target.files[0]) importLogsFromFile(e.target.files[0]);
+    e.target.value = '';
+  });
+  const backupInput = document.getElementById('import-backup');
+  if (backupInput) backupInput.addEventListener('change', e => {
+    if (e.target.files[0]) restoreBackupFromFile(e.target.files[0]);
     e.target.value = '';
   });
   const clearBtn = document.getElementById('clear-logs');
