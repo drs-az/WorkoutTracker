@@ -400,34 +400,6 @@ function editLog(id) {
   if (submitBtn) submitBtn.textContent = 'Update Workout';
 }
 
-function exportLogs() {
-  const data = localStorage.getItem('detailedWorkoutLogs') || '[]';
-  const blob = new Blob([data], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'workout-logs.json';
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importLogsFromFile(file) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const incoming = JSON.parse(e.target.result);
-      if (!Array.isArray(incoming)) throw new Error();
-      const current = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
-      const combined = [...incoming, ...current];
-      localStorage.setItem('detailedWorkoutLogs', JSON.stringify(combined));
-      backupLocalData();
-      renderLogs();
-    } catch (_) {
-      alert('Invalid workout log file');
-    }
-  };
-  reader.readAsText(file);
-}
 
 function restoreBackupFromFile(file) {
   const reader = new FileReader();
@@ -492,13 +464,6 @@ function importExercisesFromFile(file) {
   reader.readAsText(file);
 }
 
-function clearAllLogs() {
-  if (confirm('Delete all workout logs?')) {
-    localStorage.removeItem('detailedWorkoutLogs');
-    backupLocalData();
-    renderLogs();
-  }
-}
 
 function showSection(section) {
   const sections = {
@@ -534,20 +499,11 @@ window.onload = () => {
   if (navHistory) navHistory.onclick = () => { showSection('history'); renderLogs(); };
   if (navSettings) navSettings.onclick = () => { showSection('settings'); };
 
-  const exportBtn = document.getElementById('export-logs');
-  if (exportBtn) exportBtn.onclick = exportLogs;
-  const importInput = document.getElementById('import-logs');
-  if (importInput) importInput.addEventListener('change', e => {
-    if (e.target.files[0]) importLogsFromFile(e.target.files[0]);
-    e.target.value = '';
-  });
   const backupInput = document.getElementById('import-backup');
   if (backupInput) backupInput.addEventListener('change', e => {
     if (e.target.files[0]) restoreBackupFromFile(e.target.files[0]);
     e.target.value = '';
   });
-  const clearBtn = document.getElementById('clear-logs');
-  if (clearBtn) clearBtn.onclick = clearAllLogs;
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
