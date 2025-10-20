@@ -4,8 +4,7 @@ const PRECACHE_URLS = [
   'index.html',
   'style.css',
   'app.js',
-  'manifest.json',
-  '185-1851780_cartman-beefcake-eric-cartman-beefcake.png'
+  'manifest.json'
 ];
 
 self.addEventListener('install', event => {
