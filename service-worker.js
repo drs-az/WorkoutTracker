@@ -1,21 +1,38 @@
+const CACHE_NAME = 'workout-cache-v2';
+const PRECACHE_URLS = [
+  '/',
+  'index.html',
+  'style.css',
+  'app.js',
+  'manifest.json',
+  '185-1851780_cartman-beefcake-eric-cartman-beefcake.png'
+];
+
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open('workout-cache-v1').then(cache => {
-      return cache.addAll([
-        'index.html',
-        'style.css',
-        'app.js',
-        'manifest.json',
-        '185-1851780_cartman-beefcake-eric-cartman-beefcake.png'
-      ]);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_URLS))
   );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      )
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });

@@ -172,6 +172,10 @@ li button:hover {
   margin-bottom: 1rem;
 }
 
+#settings button {
+  margin-top: 0.5rem;
+}
+
 #log-history,
 #settings {
   display: none;

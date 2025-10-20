@@ -380,8 +380,15 @@ function editLog(id) {
 
   editingLogId = id;
 
-  document.getElementById('exercise-select').value = log.exercise;
-  document.getElementById('set-count').value = log.sets.length;
+  showSection('log');
+  renderPlan();
+
+  const exerciseSelect = document.getElementById('exercise-select');
+  const setCountInput = document.getElementById('set-count');
+  if (!exerciseSelect || !setCountInput) return;
+
+  exerciseSelect.value = log.exercise;
+  setCountInput.value = log.sets.length;
   generateSetInputs();
 
   setTimeout(() => {
@@ -398,6 +405,11 @@ function editLog(id) {
 
   const submitBtn = document.querySelector('#exercise-form button[type="submit"]');
   if (submitBtn) submitBtn.textContent = 'Update Workout';
+
+  const container = document.getElementById('workout-plan');
+  if (container) {
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 
@@ -465,6 +477,44 @@ function importExercisesFromFile(file) {
 }
 
 
+async function updateAppAssets() {
+  try {
+    if ('caches' in window) {
+      const cacheKeys = await caches.keys();
+      await Promise.all(cacheKeys.map(key => caches.delete(key)));
+    }
+
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+
+      const requestSkipWaiting = worker => {
+        if (worker) worker.postMessage({ type: 'SKIP_WAITING' });
+      };
+
+      registration.addEventListener?.('updatefound', () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed') {
+              requestSkipWaiting(registration.waiting);
+            }
+          });
+        }
+      });
+
+      await registration.update();
+      requestSkipWaiting(registration.waiting);
+    }
+
+    alert('App updated! Reloading...');
+    window.location.reload();
+  } catch (error) {
+    console.error('Failed to update app', error);
+    alert('Unable to update the app automatically. Please refresh the page to try again.');
+  }
+}
+
+
 function showSection(section) {
   const sections = {
     log: document.getElementById('workout-plan'),
@@ -504,6 +554,9 @@ window.onload = () => {
     if (e.target.files[0]) restoreBackupFromFile(e.target.files[0]);
     e.target.value = '';
   });
+
+  const updateButton = document.getElementById('update-app-button');
+  if (updateButton) updateButton.addEventListener('click', updateAppAssets);
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
