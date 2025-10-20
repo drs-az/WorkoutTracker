@@ -406,20 +406,17 @@ function editLog(id) {
       if (s.reps) input.querySelector('.reps').value = s.reps;
       const minutesInput = input.querySelector('.time-minutes');
       const secondsInput = input.querySelector('.time-seconds');
-      const hasLegacyTime = s.time !== undefined && s.time !== null && s.time !== '';
-      const hasMinutes = s.timeMinutes !== undefined && s.timeMinutes !== null && s.timeMinutes !== '';
-      const hasSeconds = s.timeSeconds !== undefined && s.timeSeconds !== null && s.timeSeconds !== '';
       if (minutesInput) {
-        if (hasMinutes) {
+        if (s.timeMinutes !== undefined && s.timeMinutes !== null) {
           minutesInput.value = s.timeMinutes;
-        } else if (hasLegacyTime) {
+        } else if (s.time && (s.timeSeconds === undefined || s.timeSeconds === null || !secondsInput)) {
           minutesInput.value = s.time;
         }
       }
       if (secondsInput) {
-        if (hasSeconds) {
+        if (s.timeSeconds !== undefined && s.timeSeconds !== null) {
           secondsInput.value = s.timeSeconds;
-        } else if (!minutesInput && hasLegacyTime) {
+        } else if (s.time && (s.timeMinutes === undefined || s.timeMinutes === null || !minutesInput)) {
           secondsInput.value = s.time;
         }
       }
