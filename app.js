@@ -29,7 +29,6 @@ function getOrAskName() {
     name = prompt('Welcome! What is your first name?');
     if (name) {
       localStorage.setItem('userFirstName', name);
-      backupLocalData();
     }
   }
   const title = name ? `${name}'s Workout Tracker` : 'Workout Tracker';
@@ -50,7 +49,7 @@ const defaultExercises = {
   'Bent-over Rows': ['weight', 'reps'],
   'Overhead Press': ['weight', 'reps'],
   'Lateral Raises': ['weight', 'reps'],
-  'Plank': ['time-seconds'],
+  'Plank': ['time-minutes', 'time-seconds'],
   'Crunches': ['reps']
 };
 
@@ -110,13 +109,22 @@ function renderPlan() {
 
     const logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
 
-    const setData = Array.from(sets).map(set => ({
-      reps: set.querySelector('.reps')?.value || null,
-      weight: set.querySelector('.weight')?.value || null,
-      time: set.querySelector('.time')?.value || null,
-      seatPosition: set.querySelector('.seat-position')?.value || null,
-      notes: set.querySelector('.notes')?.value || null
-    }));
+    const setData = Array.from(sets).map(set => {
+      const minutesInput = set.querySelector('.time-minutes');
+      const secondsInput = set.querySelector('.time-seconds');
+
+      const minutesValue = minutesInput ? minutesInput.value : null;
+      const secondsValue = secondsInput ? secondsInput.value : null;
+
+      return {
+        reps: set.querySelector('.reps')?.value || null,
+        weight: set.querySelector('.weight')?.value || null,
+        timeMinutes: minutesValue === '' ? null : minutesValue,
+        timeSeconds: secondsValue === '' ? null : secondsValue,
+        seatPosition: set.querySelector('.seat-position')?.value || null,
+        notes: set.querySelector('.notes')?.value || null
+      };
+    });
 
       if (editingLogId !== null) {
         const index = logs.findIndex(l => l.id === editingLogId);
@@ -137,8 +145,6 @@ function renderPlan() {
     }
 
     localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs));
-    backupLocalData();
-
     renderLogs();
     document.getElementById('set-inputs').innerHTML = '';
     e.target.reset();
@@ -206,11 +212,9 @@ function renderAddExerciseForm() {
 
     customExercises[name] = fields;
     localStorage.setItem('customExercises', JSON.stringify(customExercises));
-    backupLocalData();
   if (video) {
     customExerciseVideos[name] = video;
     localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
-    backupLocalData();
   } else if (rawVideo) {
     alert('Video URL must start with http:// or https://');
   }
@@ -236,7 +240,6 @@ function deleteCustomExercise(name) {
   delete customExerciseVideos[name];
   localStorage.setItem('customExercises', JSON.stringify(customExercises));
   localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
-  backupLocalData();
   renderManageExercises();
 }
 
@@ -269,10 +272,10 @@ function generateSetInputs(linkOnly = false) {
       inputs += `<div class="set-input-row"><label>Reps: <input type="number" class="reps" required></label></div>`;
     }
     if (fields.includes('time-minutes')) {
-      inputs += `<div class="set-input-row"><label>Minutes: <input type="number" class="time" required></label></div>`;
+      inputs += `<div class="set-input-row"><label>Minutes: <input type="number" class="time-minutes" required></label></div>`;
     }
     if (fields.includes('time-seconds')) {
-      inputs += `<div class="set-input-row"><label>Seconds: <input type="number" class="time" required></label></div>`;
+      inputs += `<div class="set-input-row"><label>Seconds: <input type="number" class="time-seconds" required></label></div>`;
     }
     if (fields.includes('seat-position')) {
       inputs += `<div class="set-input-row"><label>Seat Position: <input type="text" class="seat-position"></label></div>`;
@@ -307,7 +310,6 @@ function editVideoLink() {
     if (url.trim()) alert('Video URL must start with http:// or https://');
   }
   localStorage.setItem('customExerciseVideos', JSON.stringify(customExerciseVideos));
-  backupLocalData();
   generateSetInputs(true);
 }
 
@@ -337,7 +339,13 @@ function renderLogs() {
           const parts = [];
           if (s.reps) parts.push(`${s.reps} reps`);
           if (s.weight) parts.push(`@ ${s.weight} lbs`);
-          if (s.time) parts.push(`${s.time} sec`);
+          const timeParts = [];
+          const hasMinutes = s.timeMinutes !== undefined && s.timeMinutes !== null && s.timeMinutes !== '';
+          const hasSeconds = s.timeSeconds !== undefined && s.timeSeconds !== null && s.timeSeconds !== '';
+          if (hasMinutes) timeParts.push(`${s.timeMinutes} min`);
+          if (hasSeconds) timeParts.push(`${s.timeSeconds} sec`);
+          if (!timeParts.length && s.time) timeParts.push(`${s.time} sec`);
+          if (timeParts.length) parts.push(timeParts.join(' '));
           if (s.seatPosition) parts.push(`Seat ${s.seatPosition}`);
           if (s.notes) parts.push(`Notes: ${s.notes}`);
           return `Set ${i + 1}: ${parts.join(' ')}`;
@@ -369,7 +377,6 @@ function deleteLog(id) {
   let logs = JSON.parse(localStorage.getItem('detailedWorkoutLogs')) || [];
   logs = logs.filter(log => log.id !== id);
   localStorage.setItem('detailedWorkoutLogs', JSON.stringify(logs));
-  backupLocalData();
   renderLogs();
 }
 
@@ -397,7 +404,22 @@ function editLog(id) {
       const input = inputs[i];
       if (s.weight) input.querySelector('.weight').value = s.weight;
       if (s.reps) input.querySelector('.reps').value = s.reps;
-      if (s.time) input.querySelector('.time').value = s.time;
+      const minutesInput = input.querySelector('.time-minutes');
+      const secondsInput = input.querySelector('.time-seconds');
+      if (minutesInput) {
+        if (s.timeMinutes !== undefined && s.timeMinutes !== null) {
+          minutesInput.value = s.timeMinutes;
+        } else if (s.time && (s.timeSeconds === undefined || s.timeSeconds === null || !secondsInput)) {
+          minutesInput.value = s.time;
+        }
+      }
+      if (secondsInput) {
+        if (s.timeSeconds !== undefined && s.timeSeconds !== null) {
+          secondsInput.value = s.timeSeconds;
+        } else if (s.time && (s.timeMinutes === undefined || s.timeMinutes === null || !minutesInput)) {
+          secondsInput.value = s.time;
+        }
+      }
       if (s.seatPosition) input.querySelector('.seat-position').value = s.seatPosition;
       if (s.notes) input.querySelector('.notes').value = s.notes;
     });
@@ -452,7 +474,6 @@ function importExercisesFromFile(file) {
         }
         customExercises = existing;
         localStorage.setItem('customExercises', JSON.stringify(existing));
-        backupLocalData();
       }
 
       if (incoming.customExerciseVideos && typeof incoming.customExerciseVideos === 'object') {
@@ -465,7 +486,6 @@ function importExercisesFromFile(file) {
         }
         customExerciseVideos = existingVideos;
         localStorage.setItem('customExerciseVideos', JSON.stringify(existingVideos));
-        backupLocalData();
       }
 
       renderPlan();
@@ -557,6 +577,9 @@ window.onload = () => {
 
   const updateButton = document.getElementById('update-app-button');
   if (updateButton) updateButton.addEventListener('click', updateAppAssets);
+
+  const downloadBackupButton = document.getElementById('download-backup-button');
+  if (downloadBackupButton) downloadBackupButton.addEventListener('click', backupLocalData);
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
